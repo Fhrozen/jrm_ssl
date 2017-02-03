@@ -1,0 +1,57 @@
+#!/usr/bin/env batchflow
+<?xml version="1.0"?>
+<Document>
+  <Network type="subnet" name="MAIN">
+    <Node name="node_Constant_1" type="Constant" x="440" y="200">
+      <Parameter name="VALUE" type="subnet_param" value="ARG4" description="The value"/>
+    </Node>
+    <Node name="node_LOOP0_1" type="LOOP0" x="1040" y="200">
+      <Parameter name="EXT1" type="subnet_param" value="ARG1" description="subnet_param"/>
+      <Parameter name="EXT2" type="subnet_param" value="ARG2" description="subnet_param"/>
+    </Node>
+    <Node name="node_InputStream_1" type="InputStream" x="700" y="190">
+      <Parameter name="TYPE" type="int" value="" description="Type of stream: stream, fd, or FILE (default stream)"/>
+      <Parameter name="RETRY" type="int" value="" description="If set to N, InputStream will retry N times on open fail"/>
+    </Node>
+    <Link from="node_Constant_1" output="VALUE" to="node_InputStream_1" input="INPUT"/>
+    <Link from="node_InputStream_1" output="OUTPUT" to="node_LOOP0_1" input="INPUT"/>
+    <NetOutput name="OUTPUT" node="node_LOOP0_1" terminal="OUTPUT" object_type="any" description="Dynamic"/>
+  </Network>
+  <Network type="iterator" name="LOOP0">
+    <Node name="node_AudioStreamFromWave_1" type="AudioStreamFromWave" x="440" y="190">
+      <Parameter name="LENGTH" type="int" value="512" description="The frame length of each channel (in samples) [default: 512]."/>
+      <Parameter name="ADVANCE" type="int" value="160" description="The shift length beween adjacent frames (in samples)[default: 160]."/>
+      <Parameter name="USE_WAIT" type="bool" value="false" description="If true, real recording is simulated [default: false]."/>
+    </Node>
+    <Node name="node_MultiFFT_1" type="MultiFFT" x="780" y="190">
+      <Parameter name="LENGTH" type="int" value="512" description="FFT length in sample. [default: 512]"/>
+      <Parameter name="WINDOW" type="string" value="HAMMING" description="A window function for FFT. WINDOW should be CONJ, HAMMING, RECTANGLE, or HANNING. [default: CONJ]"/>
+      <Parameter name="WINDOW_LENGTH" type="int" value="512" description="Window length of the window function. [default: 512]"/>
+    </Node>
+    <Node name="node_PyCodeExecutor_1" type="PyCodeExecutor" x="1310" y="350">
+      <Parameter name="DIRECTORY_NAME" type="string" value="./" description="[optional] The directory name of your python code. It will inserted to sys.path."/>
+      <Parameter name="MODULENAME" type="string" value="pyhark" description="Your python module name to import, i.e., your python code file name WITHOUT extension."/>
+      <Parameter name="CLASSNAME" type="string" value="StackFFT" description="Your class name to call in this node."/>
+      <Parameter name="DEBUG" type="bool" value="false" description="Debug option. If true, it prints input list and output list."/>
+    </Node>
+    <Node name="node_Constant_2" type="Constant" x="770" y="370">
+      <Parameter name="VALUE" type="subnet_param" value="EXT1" description="The value"/>
+    </Node>
+    <Node name="node_Constant_3" type="Constant" x="760" y="480">
+      <Parameter name="VALUE" type="subnet_param" value="EXT2" description="The value"/>
+    </Node>
+    <Node name="node_ToInt_1" type="ToInt" x="970" y="370">
+    </Node>
+    <Node name="node_ToInt_2" type="ToInt" x="1020" y="480">
+    </Node>
+    <Link from="node_AudioStreamFromWave_1" output="AUDIO" to="node_MultiFFT_1" input="INPUT"/>
+    <Link from="node_Constant_2" output="VALUE" to="node_ToInt_1" input="INPUT"/>
+    <Link from="node_ToInt_1" output="OUTPUT" to="node_PyCodeExecutor_1" input="EXT1"/>
+    <Link from="node_Constant_3" output="VALUE" to="node_ToInt_2" input="INPUT"/>
+    <Link from="node_ToInt_2" output="OUTPUT" to="node_PyCodeExecutor_1" input="EXT2"/>
+    <Link from="node_MultiFFT_1" output="OUTPUT" to="node_PyCodeExecutor_1" input="INPUT"/>
+    <NetInput name="INPUT" node="node_AudioStreamFromWave_1" terminal="INPUT" object_type="Stream" description="An audio input stream (IStream)."/>
+    <NetOutput name="OUTPUT" node="node_PyCodeExecutor_1" terminal="OUTPUT" object_type="any" description="Dynamically added outputs"/>
+    <NetCondition name="CONDITION" node="node_AudioStreamFromWave_1" terminal="NOT_EOF"/>
+  </Network>
+</Document>
