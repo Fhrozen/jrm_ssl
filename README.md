@@ -16,7 +16,7 @@ Run ./chainer_train.py t -C $(config_file) from training folder to train a model
 
 ## Evaluation
 
-It is possible to find the forwarding file in the folder microcone 
+The forwarding file is located in the microcone folder 
 
 - Run ./ssl_test.py $(DATE_OF_TRAINED_MODEL) to forward the audio files (Any corpus, any language is fine)
 - Run ./compile_results.py to obtain the block accuracy (median angle) - change the exp variable inside the
@@ -27,16 +27,16 @@ file according to the folder you want to test
 ## Folder Structure
 
 - dataset_preparation : Two examples of the dataset prepared for the training
-- micrcone : Files to evaluate any model and a network example to be trained
+- microcone : Files to evaluate any model and a network example to be trained
 - python_utils : extra files for training, preparing data, etc.
 - training : files for training a network
 - training_files : an example of a generated network and the files to test
 
 ## Impulses Response
 
-It is possible to generate the impulse using the [ISM](http://www.eric-lehmann.com/) of Eric A. Lehmann
+To generate the impulse use [ISM](http://www.eric-lehmann.com/) of Eric A. Lehmann
 
-Information of Microcone position microphones at [HARK](http://www.hark.jp/) Supported Harwards
+Information of Microcone position microphones at [HARK](http://www.hark.jp/) Supported Hardwares
 
 ## Publication
 
